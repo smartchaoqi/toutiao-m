@@ -10,30 +10,34 @@ const routes = [
     component: () => import('@/views/login')
   },
   {
-    path: '/',
+    path: '/layout',
     component: () => import('@/views/layout'),
     children: [
       {
-        path: '', // 默认子路由，只能有1个
         name: 'home',
+        path: '', // 默认子路由，只能有1个
         component: () => import('@/views/home')
       },
       {
-        path: '/qa',
         name: 'qa',
+        path: 'qa',
         component: () => import('@/views/qa')
       },
       {
-        path: '/video',
         name: 'video',
+        path: 'video',
         component: () => import('@/views/video')
       },
       {
-        path: '/my',
         name: 'my',
+        path: 'my',
         component: () => import('@/views/my')
       }
     ]
+  },
+  {
+    path:'/',
+    redirect:"/layout"
   }
 ]
 

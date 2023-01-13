@@ -4,19 +4,19 @@
     <router-view/>
 
     <van-tabbar class="layout-tabbar" route>
-      <van-tabbar-item to="/">
+      <van-tabbar-item replace to="/layout/">
         <i slot="icon" class="toutiao toutiao-shouye"></i>
         <span class="text">首页</span>
       </van-tabbar-item>
-      <van-tabbar-item to="/qa">
+      <van-tabbar-item replace to="/layout/qa">
         <i slot="icon" class="toutiao toutiao-wenda"></i>
         <span class="text">问答</span>
       </van-tabbar-item>
-      <van-tabbar-item to="/video">
+      <van-tabbar-item replace to="/layout/video">
         <i slot="icon" class="toutiao toutiao-shipin"></i>
         <span class="text">视频</span>
       </van-tabbar-item>
-      <van-tabbar-item to="/my">
+      <van-tabbar-item replace to="/layout/my">
         <i slot="icon" class="toutiao toutiao-wode"></i>
         <span class="text">我的</span>
       </van-tabbar-item>
