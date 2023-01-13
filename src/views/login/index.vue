@@ -85,12 +85,15 @@ export default {
         duration:0
       });
       try{
-        const res = await login(this.user)
+        const { data } = await login(this.user)
+        this.$store.commit("setUser",data.data)
         this.$toast.success("登录成功")
-        console.log('登录成功',res);
       }catch(err){
-        this.$toast.fail("登录失败")
-        console.log('登录失败',err);
+        if (err.response.status===400){
+          this.$toast.fail("手机号或验证码错误")
+        }else {
+          this.$toast.fail("登录失败,请稍后重试")
+        }
       }
     },
     async onSendSms(){
