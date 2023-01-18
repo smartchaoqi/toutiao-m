@@ -23,25 +23,42 @@
       <div slot="nav-right" class="placeholder">
 
       </div>
-      <div slot="nav-right" class="hanburger-btn">
+      <div @click="isChennelEditShow=true"
+           slot="nav-right"
+           class="hanburger-btn">
         <i class="toutiao toutiao-gengduo"></i>
       </div>
     </van-tabs>
+
+<!--    频道编辑弹出层-->
+    <van-popup
+      v-model="isChennelEditShow"
+      closeable
+      position="bottom"
+      close-icon-position="top-left"
+      :style="{ height: '100%' }"
+    >
+      <channel-edit
+        :active="active"
+        :my-channels="channels"></channel-edit>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import {getUserChannels} from '@/api/user'
 import ArticleList from '@/views/home/components/article-list'
+import ChannelEdit from '@/views/home/components/channel-edit'
 export default {
   name: 'HomeIndex',
   components:{
-    ArticleList
+    ArticleList,ChannelEdit
   },
   data(){
     return{
       active:0,
-      channels:[]
+      channels:[],
+      isChennelEditShow:false
     }
   },
   methods:{
