@@ -23,7 +23,7 @@
       <div slot="nav-right" class="placeholder">
 
       </div>
-      <div @click="isChennelEditShow=true"
+      <div @click="isChannelEditShow=true"
            slot="nav-right"
            class="hanburger-btn">
         <i class="toutiao toutiao-gengduo"></i>
@@ -32,13 +32,14 @@
 
 <!--    频道编辑弹出层-->
     <van-popup
-      v-model="isChennelEditShow"
+      v-model="isChannelEditShow"
       closeable
       position="bottom"
       close-icon-position="top-left"
       :style="{ height: '100%' }"
     >
       <channel-edit
+        @update-active="onUpdateActive"
         :active="active"
         :my-channels="channels"></channel-edit>
     </van-popup>
@@ -47,6 +48,8 @@
 
 <script>
 import {getUserChannels} from '@/api/user'
+import { mapState } from 'vuex'
+import { getItem } from '@/utils/storage'
 import ArticleList from '@/views/home/components/article-list'
 import ChannelEdit from '@/views/home/components/channel-edit'
 export default {
@@ -58,21 +61,43 @@ export default {
     return{
       active:0,
       channels:[],
-      isChennelEditShow:false
+      isChannelEditShow:false
     }
   },
   methods:{
     async loadChannels(){
       try{
-        const {data} = await getUserChannels()
-        this.channels=data.data.channels
+        // const {data} = await getUserChannels()
+        // this.channels=data.data.channels
+        let channels=[]
+        if (this.user){
+          const {data}=await getUserChannels()
+          channels=data.data.channels
+        }else{
+          const localChannels=getItem('TOUTIAO_CHANNELS')
+          if (localChannels){
+            this.channels=localChannels
+          }else{
+            const {data}=await getUserChannels()
+            channels=data.data.channels
+          }
+        }
+
+        this.channels=channels
       }catch (err){
         this.$toast('获取用户频道失败')
       }
+    },
+    onUpdateActive(index,isChannelEditShow=true){
+      this.active=index
+      this.isChannelEditShow=isChannelEditShow
     }
   },
   created () {
     this.loadChannels()
+  },
+  computed:{
+    ...mapState(['user'])
   }
 }
 </script>

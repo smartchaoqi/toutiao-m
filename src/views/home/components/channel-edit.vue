@@ -3,20 +3,25 @@
     <van-cell :border="false">
       <div slot="title" class="title-text">我的频道</div>
       <van-button
+        @click="isEdit=!isEdit"
         class="edit-btn"
         type="danger"
         plain
         size="mini"
-        round>编辑
+        round>{{ isEdit?'完成':'编辑' }}
       </van-button>
     </van-cell>
 
     <van-grid class="my-grid" :gutter="10">
       <van-grid-item
         class="grid-item"
+        @click="onMyChannelClick(channel,index)"
         v-for="(channel,index) in myChannels"
-        :key="index"
-        icon="clear">
+        :key="index">
+        <van-icon
+          v-show="isEdit&&!fiexdChannels.includes(channel.id)"
+          slot="icon"
+          name="clear"></van-icon>
         <span
           class="text"
           :class="{active:index===active}"
@@ -33,6 +38,7 @@
       <van-grid-item
         icon="plus"
         class="grid-item"
+        @click="onAddChannel(channel)"
         v-for="(channel,index) in recommendedChannels"
         :key="index"
         :text="channel.name"/>
@@ -41,7 +47,9 @@
 </template>
 
 <script>
-import { getAllChannels } from '@/api/channel'
+import { getAllChannels,addUserChannel,deleteUserChannel } from '@/api/channel'
+import { mapState } from 'vuex'
+import { setItem } from '@/utils/storage'
 
 export default {
   name: 'ChannelEdit',
@@ -66,11 +74,57 @@ export default {
       }catch (err){
         this.$toast("数据获取失败")
       }
+    },
+    async onAddChannel(channel){
+      this.myChannels.push(channel)
+      if (this.user){
+        try{
+          await addUserChannel({
+            id:channel.id,
+            seq:this.myChannels.length
+          })
+        }catch (err){
+          this.$toast('保存失败，稍后重试')
+        }
+      }else{
+        setItem('TOUTIAO_CHANNELS',this.myChannels)
+      }
+    },
+    onMyChannelClick(channel,index){
+      if(this.isEdit){
+        //固定频道
+        if (this.fiexdChannels.includes(channel.id)){
+          return
+        }
+        this.myChannels.splice(index,1)
+        //删除
+        if (index<=this.active){
+          this.$emit('update-active',this.active-1,true)
+        }
+        //持久化
+        this.deleteChannel(channel)
+      }else{
+        // 切换频道
+        this.$emit("update-active",index,false)
+      }
+    },
+    async deleteChannel(channel){
+      try{
+        if (this.user){
+          await deleteUserChannel(channel.id)
+        }else{
+          setItem('TOUTIAO_CHANNELS',this.myChannels)
+        }
+      }catch (err){
+        this.$toast("操作失败，清稍后重试")
+      }
     }
   },
   data(){
     return {
-      allChannels:[]
+      allChannels:[],
+      isEdit:false,//控制编辑状态
+      fiexdChannels:[0]//固定频道
     }
   },
   computed:{
@@ -83,7 +137,8 @@ export default {
         }
       })
       return channels
-    }
+    },
+    ...mapState(["user"])
   }
 }
 </script>
@@ -118,6 +173,9 @@ export default {
       }
       .active{
         color: red;
+      }
+      .van-grid-item__icon-wrapper{
+        position: unset;
       }
     }
   }

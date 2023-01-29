@@ -1,5 +1,6 @@
 <template>
   <van-cell
+    :to="'/article/' + article.art_id"
     class="article-item">
     <div slot="title" class="title van-multi-ellipsis--l2">{{ article.title }}</div>
     <div slot="label">
