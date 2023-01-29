@@ -54,6 +54,7 @@
 
 <!--        文章评论列表-->
         <comment-list
+          :list="commentList"
           @onload-success="totalCommentCount=$event.total_count"
           :source="article.art_id"
         />
@@ -65,6 +66,7 @@
             type="default"
             round
             size="small"
+            @click="isPostShow=true"
           >写评论
           </van-button>
           <van-icon
@@ -88,6 +90,15 @@
           <van-icon name="share" color="#777777"></van-icon>
         </div>
         <!-- /底部区域 -->
+
+        <van-popup
+          position="bottom"
+          v-model="isPostShow">
+          <comment-post
+            @post-success="onPostSuccess"
+            :target="article.art_id"
+          ></comment-post>
+        </van-popup>
 
       </div>
       <!-- /加载完成-文章详情 -->
@@ -125,6 +136,7 @@ import FollowUser from '@/components/follow-user'
 import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
 import CommentList from '@/views/article/components/comment-list'
+import CommentPost from '@/views/article/components/comment-post'
 
 export default {
   name: 'ArticleIndex',
@@ -132,7 +144,8 @@ export default {
     FollowUser,
     CollectArticle,
     LikeArticle,
-    CommentList
+    CommentList,
+    CommentPost
   },
   props: {
     articleId: {
@@ -142,11 +155,13 @@ export default {
   },
   data () {
     return {
+      isPostShow:false,
       article: {},
       loading: true,//加载中
       errStatus: 0,
       followLoading: false,
-      totalCommentCount:0
+      totalCommentCount:0,
+      commentList:[]
     }
   },
   computed: {},
@@ -188,7 +203,11 @@ export default {
         }
       })
     },
-
+    onPostSuccess(data){
+      this.isPostShow=false
+      this.commentList.unshift(data.new_obj)
+      this.totalCommentCount++
+    }
   }
 }
 </script>
