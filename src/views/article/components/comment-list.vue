@@ -7,8 +7,10 @@
       @load="onLoad"
       :error="error"
       error-text="加载失败，点击重试"
+      :immediate-check="false"
     >
       <comment-item
+        @reply-click="$emit('reply-click',$event)"
         v-for="(item,index) in list"
         :key="index"
         :comment="item"
@@ -45,14 +47,21 @@ export default {
       type:Array,
       required:false,
       default:()=>[]
+    },
+    type:{
+      type:String,
+      default:'a',
+      validator(value){
+        return ['a','c'].includes(value)
+      }
     }
   },
   methods: {
     async onLoad() {
       try{
         const {data} =await getComments({
-          type:'a',
-          source:this.source,
+          type:this.type,
+          source:this.source.toString(),
           offset:this.offset,
           limit:10
         })
@@ -74,6 +83,7 @@ export default {
     },
   },
   created () {
+    this.loading=true
     this.onLoad()
   }
 }

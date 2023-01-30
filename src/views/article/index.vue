@@ -54,6 +54,7 @@
 
 <!--        文章评论列表-->
         <comment-list
+          @reply-click="onReplyClick"
           :list="commentList"
           @onload-success="totalCommentCount=$event.total_count"
           :source="article.art_id"
@@ -125,7 +126,17 @@
       <!-- /加载失败：其它未知错误（例如网络原因或服务端异常） -->
     </div>
 
-
+<!--    评论回复-->
+    <van-popup
+      style="height: 100%"
+      position="bottom"
+      v-model="isReplyShow">
+      <comment-reply
+        v-if="isReplyShow"
+        @close="isReplyShow=false"
+        :comment="currentComment"
+      />
+    </van-popup>
   </div>
 </template>
 
@@ -137,6 +148,7 @@ import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
 import CommentList from '@/views/article/components/comment-list'
 import CommentPost from '@/views/article/components/comment-post'
+import CommentReply from '@/views/article/components/comment-reply'
 
 export default {
   name: 'ArticleIndex',
@@ -145,7 +157,8 @@ export default {
     CollectArticle,
     LikeArticle,
     CommentList,
-    CommentPost
+    CommentPost,
+    CommentReply
   },
   props: {
     articleId: {
@@ -155,13 +168,15 @@ export default {
   },
   data () {
     return {
+      isReplyShow:false,
       isPostShow:false,
       article: {},
       loading: true,//加载中
       errStatus: 0,
       followLoading: false,
       totalCommentCount:0,
-      commentList:[]
+      commentList:[],
+      currentComment:{}
     }
   },
   computed: {},
@@ -207,6 +222,16 @@ export default {
       this.isPostShow=false
       this.commentList.unshift(data.new_obj)
       this.totalCommentCount++
+    },
+    onReplyClick(comment){
+      console.log(comment)
+      this.currentComment=comment
+      this.isReplyShow=true
+    }
+  },
+  provide:function () {
+    return {
+      articleId:this.articleId
     }
   }
 }
